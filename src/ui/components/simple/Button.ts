@@ -11,6 +11,8 @@ import Frame from './Frame';
 import Texture from './Texture';
 
 import * as scriptFunctions from './Button.script';
+import Font from './Font';
+import { FrameEvent } from '../../FrameEvent';
 
 class Button extends Frame {
   static get scriptFunctions() {
@@ -21,6 +23,7 @@ class Button extends Frame {
   }
 
   textures: Record<ButtonState, Texture | null>;
+  fonts: Record<ButtonState, Font | null>;
 
   activeTexture: Texture | null;
   highlightTexture: Texture | null;
@@ -44,17 +47,26 @@ class Button extends Frame {
       [ButtonState.NORMAL]: null,
       [ButtonState.PUSHED]: null,
     };
+    this.fonts = {
+      [ButtonState.DISABLED]: null,
+      [ButtonState.NORMAL]: null,
+      [ButtonState.PUSHED]: null,
+    };
 
     this.activeTexture = null;
     this.highlightTexture = null;
 
     this.fontString = null;
 
-    this.state = ButtonState.DISABLED;
+    this.state = ButtonState.NORMAL;
+    this.enableEvent(FrameEvent.MOUSE);
   }
 
   loadXML(node: XMLNode, status: Status) {
+    const text = node.attributes.get('text');
     super.loadXML(node, status);
+
+    this.fontString?.setText(text ?? '');
 
     const ui = UIContext.instance;
 
@@ -82,15 +94,54 @@ class Button extends Frame {
           this.setHighlight(texture, null);
           break;
         }
-        case 'buttontext':
-          ui.createFontString(child, this);
-          // TODO: Reference above font string on this button
+        case 'normalfont': {
+          if (child.attributes.has('style')) {
+            const font = new Font();
+            font.loadTemplate(child.attributes.get('style') ?? '');
+            this.setStateFont(ButtonState.NORMAL, font);
+          }
           break;
-        // TODO: Text and font children
+        }
+        case 'disabledfont': {
+          if (child.attributes.has('style')) {
+            const font = new Font();
+            font.loadTemplate(child.attributes.get('style') ?? '');
+            this.setStateFont(ButtonState.DISABLED, font);
+          }
+          break;
+        }
+        case 'HighlightFont': {
+          if (child.attributes.has('style')) {
+            const font = new Font();
+            font.loadTemplate(child.attributes.get('style') ?? '');
+            this.setStateFont(ButtonState.PUSHED, font);
+          }
+          break;
+        }
+        case 'buttontext':
+          this.fontString = ui.createFontString(child, this);
+          this.fontString.setFrame(this, DrawLayerType.OVERLAY, true);
+          break;
       }
     }
 
     // TODO: Text, click registration and motion scripts
+  }
+
+  changeState(newState: ButtonState) {
+    this.state = newState;
+    this.activeTexture?.hide();
+    this.activeTexture = this.textures[this.state];
+    this.activeTexture?.show();
+    if (this.fonts[newState]) {
+      this.fontString?.setFont(this.fonts[newState]);
+    }
+  }
+
+  showThis(): boolean {
+    const result = super.showThis();
+    this.fontString?.show();
+    return result;
   }
 
   setHighlight(texture: Texture, _blendMode: BlendMode | null) {
@@ -108,6 +159,13 @@ class Button extends Frame {
     }
 
     this.highlightTexture = texture;
+  }
+
+  setStateFont(state: ButtonState, font: Font) {
+    this.fonts[state] = font;
+    if (this.state === state) {
+      this.fontString?.setFont(font);
+    }
   }
 
   setStateTexture(state: ButtonState, texture: Texture) {
@@ -133,6 +191,23 @@ class Button extends Frame {
     if (texture && state === this.state) {
       this.activeTexture = texture;
       texture.show();
+    }
+  }
+
+  onClick() {
+    this.runScript('OnClick');
+  }
+
+  onMouseDown() {
+    if (this.state === ButtonState.NORMAL) {
+      this.changeState(ButtonState.PUSHED);
+      this.onClick();
+    }
+  }
+
+  onMouseUp() {
+    if (this.state === ButtonState.PUSHED) {
+      this.changeState(ButtonState.NORMAL);
     }
   }
 }

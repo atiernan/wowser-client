@@ -1,31 +1,45 @@
+import Client from '../../../../Client';
 import {
   DDCtoNDCWidth,
   NDCtoDDCHeight,
   NDCtoDDCWidth,
   maxAspectCompensation,
+  fetch,
 } from '../../../../utils';
 import {
+  luaL_error,
   lua_State,
+  lua_isstring,
   lua_pushboolean,
   lua_pushnil,
   lua_pushnumber,
   lua_pushstring,
+  lua_tojsstring,
+  lua_type,
+  lua_typename,
 } from '../../../scripting/lua';
 
 export const IsShiftKeyDown = () => {
   return 0;
 };
 
-export const GetBuildInfo = () => {
-  return 0;
+export const GetBuildInfo = (L: lua_State) => {
+  lua_pushstring(L, 'Version');     // Version Type
+  lua_pushstring(L, import.meta.env.VITE_BUILD_TYPE ?? 'dev');  // Build Type
+  lua_pushstring(L, import.meta.env.VITE_VERSION ?? '');        // Version
+  lua_pushstring(L, import.meta.env.VITE_COMMIT_HASH ?? '');    // Internal Version
+  lua_pushstring(L, import.meta.env.VITE_BUILD_DATE ?? '');     // Build date
+  return 1;
 };
 
 export const GetLocale = () => {
   return 0;
 };
 
-export const GetSavedAccountName = () => {
-  return 0;
+export const GetSavedAccountName = (L: lua_State) => {
+  // TODO: Implementation
+  lua_pushstring(L, '');
+  return 1;
 };
 
 export const SetSavedAccountName = () => {
@@ -55,6 +69,7 @@ export const SetCurrentScreen = () => {
 };
 
 export const QuitGame = () => {
+  console.error('QuitGame called');
   return 0;
 };
 
@@ -98,7 +113,13 @@ export const GetScreenHeight = (L: lua_State) => {
   return 1;
 };
 
-export const LaunchURL = () => {
+export const LaunchURL = (L: lua_State) => {
+  if (lua_isstring(L, 1)) {
+    window.open(lua_tojsstring(L, 1), '_blank');
+  } else {
+    const type = lua_typename(L, lua_type(L, 1));
+    console.error(`Could not open URL: unexpected ${type}`);
+  }
   return 0;
 };
 
@@ -134,8 +155,10 @@ export const ShowTerminationWithoutNoticeNotice = () => {
   return 0;
 };
 
-export const TerminationWithoutNoticeAccepted = () => {
-  return 0;
+export const TerminationWithoutNoticeAccepted = (L: lua_State) => {
+  // TODO: Implementation
+  lua_pushboolean(L, 1);
+  return 1;
 };
 
 export const AcceptTerminationWithoutNotice = () => {

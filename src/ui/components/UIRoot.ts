@@ -113,8 +113,6 @@ class UIRoot extends LayoutFrame {
   onLayerUpdate(elapsedSecs: number) {
     // TODO: Clean-up destroyed frames
 
-    console.log('root pre-render');
-
     LayoutFrame.resizePending();
 
     for (const strata of this.strata) {

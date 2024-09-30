@@ -37,8 +37,6 @@ class FrameStrata {
 
     const level = this.levels[frame.level];
 
-    console.debug(`adding ${frame.name} to strata ${frame.strataType} level ${frame.level}`);
-
     if (!frame.strataLink.isLinked) {
       const frames = level.pendingFrame ? level.pendingFrames : level.frames;
       frames.add(frame);
@@ -96,27 +94,13 @@ class FrameStrata {
   onLayerRender() {
     const { renderer } = UIContext.instance;
 
-    console.group(`strata ${this.type} (${this.name})`);
-
     this.prepareRenderBatches();
 
     for (const level of this.levels) {
-      console.group(`level ${level.index}`);
-
-      const frames = Array.from(level.frames);
-
-      console.debug('frame names', frames.map((f) => f.name));
-      console.debug('frames', frames);
-      console.debug('render list', Array.from(level.renderList));
-
       for (const batch of level.renderList) {
         renderer.draw(batch);
       }
-
-      console.groupEnd();
     }
-
-    console.groupEnd();
   }
 }
 

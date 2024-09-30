@@ -1,3 +1,15 @@
+import {
+  lua_State,
+  lua_isstring,
+  lua_type,
+  lua_typename,
+  luaL_error,
+  lua_tojsstring,
+  lua_isnil,
+} from '../../scripting/lua';
+
+import FontString from './FontString';
+
 export const IsObjectType = () => {
   return 0;
 };
@@ -70,11 +82,24 @@ export const GetFieldSize = () => {
   return 0;
 };
 
-export const SetText = () => {
+export const SetText = (L: lua_State) => {
+  const fontString = <FontString>FontString.getObjectFromStack(L);
+  
+  if (lua_isnil(L, 1)) {
+    fontString.setText('');
+  } else if (lua_isstring(L, 1)) {
+    fontString.setText(lua_tojsstring(L, 1));
+  } else {
+    const type = lua_typename(L, lua_type(L, 1));
+    return luaL_error(L, 'Unexpected %s, expected string in %s:SetText(text)', type, fontString.displayName);
+  }
+
   return 0;
 };
 
-export const SetFormattedText = () => {
+export const SetFormattedText = (L: lua_State) => {
+  const fontString = FontString.getObjectFromStack(L);
+  fontString.setText('Version 3.3.4 (1234)');
   return 0;
 };
 

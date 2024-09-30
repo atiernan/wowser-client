@@ -47,6 +47,7 @@ import FrameScriptObject from './FrameScriptObject';
 
 import * as extraScriptFunctions from './globals/extra';
 import * as frameScriptFunctions from './globals/frame';
+import * as gfxScriptFunctions from './globals/gfx';
 import * as sharedScriptFunctions from './globals/shared';
 import * as soundScriptFunctions from './globals/sound';
 import * as systemScriptFunctions from './globals/system';
@@ -95,6 +96,7 @@ class ScriptingContext {
     this.registerFunctions(sharedScriptFunctions);
     this.registerFunctions(soundScriptFunctions);
     this.registerFunctions(systemScriptFunctions);
+    this.registerFunctions(gfxScriptFunctions);
 
     this.execute(compatLua, 'compat.lua');
   }

@@ -35,8 +35,6 @@ class Screen {
     // TODO: Generic device interface
     const { gl } = Device.instance as WebGL2Device;
 
-    console.group('render');
-
     // Ensure canvas is properly sized
     const {
       clientWidth: displayWidth,
@@ -104,8 +102,6 @@ class Screen {
     // device.presentScene();
 
     this.debugLines();
-
-    console.groupEnd();
 
     // TODO: Render again
     // requestAnimationFrame(this.render);

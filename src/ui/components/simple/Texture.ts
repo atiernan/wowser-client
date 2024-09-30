@@ -299,8 +299,6 @@ class Texture extends Region {
     this.position[1].setElements(rect.minX, rect.minY, this.layoutDepth);
     this.position[2].setElements(rect.maxX, rect.maxY, this.layoutDepth);
     this.position[3].setElements(rect.maxX, rect.minY, this.layoutDepth);
-
-    console.debug('setting position for', this.name, 'to:', this.position);
   }
 
   // TODO: Create flags

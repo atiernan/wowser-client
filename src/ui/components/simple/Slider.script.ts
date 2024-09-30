@@ -18,8 +18,10 @@ export const SetOrientation = () => {
   return 0;
 };
 
-export const GetMinMaxValues = () => {
-  return 0;
+export const GetMinMaxValues = (L: lua_State) => {
+  lua_pushnumber(L, 1);
+  lua_pushnumber(L, 100);
+  return 2;
 };
 
 export const SetMinMaxValues = () => {

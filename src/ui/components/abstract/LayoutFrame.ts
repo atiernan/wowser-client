@@ -629,6 +629,10 @@ class LayoutFrame {
       }
     }
   }
+
+  containsPoint(x: number, y: number) {
+    return this.rect.minX < x && this.rect.maxX > x && this.rect.minY < y && this.rect.maxY > y;
+  }
 }
 
 export default LayoutFrame;

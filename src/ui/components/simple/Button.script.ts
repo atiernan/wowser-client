@@ -5,23 +5,31 @@ import {
 import {
   LUA_REGISTRYINDEX,
   lua_State,
+  lua_pushboolean,
   lua_pushnil,
   lua_pushnumber,
   lua_rawgeti,
 } from '../../scripting/lua';
 
 import Button from './Button';
+import ButtonState from './ButtonState';
 
-export const Enable = () => {
+export const Enable = (L: lua_State) => {
+  const button = Button.getObjectFromStack(L);
+  button.changeState(ButtonState.NORMAL);
   return 0;
 };
 
-export const Disable = () => {
+export const Disable = (L: lua_State) => {
+  const button = Button.getObjectFromStack(L);
+  button.changeState(ButtonState.DISABLED);
   return 0;
 };
 
-export const IsEnabled = () => {
-  return 0;
+export const IsEnabled = (L: lua_State) => {
+  const button = Button.getObjectFromStack(L);
+  lua_pushboolean(L, button.state === ButtonState.NORMAL);
+  return 1;
 };
 
 export const GetButtonState = () => {

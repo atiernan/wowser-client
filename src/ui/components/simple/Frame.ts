@@ -26,6 +26,7 @@ import {
 import FrameFlag from './FrameFlag';
 import TitleRegion from './TitleRegion';
 import * as scriptFunctions from './Frame.script';
+import { FrameEvent } from '../../FrameEvent';
 
 class FrameNode extends LinkedListNode {
   frame: Frame;
@@ -116,6 +117,7 @@ class Frame extends ScriptRegion {
       new Script('OnKeyDown', ['key']),
       new Script('OnKeyUp', ['key']),
       new Script('OnAttributeChange', ['name', 'value']),
+      new Script('OnAttributeChanged', ['name', 'value']),
       new Script('OnEnable'),
       new Script('OnDisable'),
     );
@@ -562,8 +564,6 @@ class Frame extends ScriptRegion {
   addRegion(region: Region, drawLayerType: DrawLayerType) {
     // TODO: Layout scaling
 
-    console.debug(`adding ${region.name} as frame region to ${this.name} on layer ${drawLayerType}`);
-
     this.layers[drawLayerType].add(region);
     this.notifyDrawLayerChanged(drawLayerType);
   }
@@ -632,6 +632,7 @@ class Frame extends ScriptRegion {
 
   onLayerUpdate(_elapsedSecs: number) {
     // TODO: Run update script
+    this.runOnUpdateScript(_elapsedSecs);
 
     // TODO: Run PreOnAnimUpdate hooks
 
@@ -660,6 +661,12 @@ class Frame extends ScriptRegion {
     }
   }
 
+  runOnUpdateScript(elapsedSecs: number) {
+    if (!this.loading && this.shown) {
+      this.runScript('OnUpdate', [{ type: 'number', value: elapsedSecs }]);
+    }
+  }
+
   updateScale(force: boolean) {
     let scale = this.frameScale;
     if (this.parent) {
@@ -681,6 +688,10 @@ class Frame extends ScriptRegion {
     }
 
     return true;
+  }
+
+  enableEvent(event: FrameEvent) {
+    UIContext.instance.enableEvent(event, this.strataType, this);
   }
 }
 

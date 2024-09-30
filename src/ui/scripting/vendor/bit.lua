@@ -1,6 +1,6 @@
 -- from: https://github.com/fengari-lua/fengari/blob/master/test/test-suite/bitwise.test.js
 
-local bit = {}
+bit = {}
 
 function bit.bnot (a)
   return ~a & 0xFFFFFFFF

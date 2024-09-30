@@ -30,7 +30,7 @@ export const GetHorizontalScrollRange = () => {
 
 export const GetVerticalScrollRange = (L: lua_State) => {
   // TODO: Implementation
-  lua_pushnumber(L, 0);
+  lua_pushnumber(L, 100);
   return 1;
 };
 

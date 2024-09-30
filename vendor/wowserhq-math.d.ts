@@ -7,6 +7,7 @@ declare module '@wowserhq/math' {
     multiply(r: Matrix4): this;
     translate(move: InputVector3): this;
     transpose(): this;
+    invert(): this;
   }
 
   class Vector2 extends Float32Array {
@@ -22,5 +23,6 @@ declare module '@wowserhq/math' {
     z: number;
 
     setElements(x: number, y: number, z: number): this;
+    multiplyMatrix4(m: Matrix4): this;
   }
 }

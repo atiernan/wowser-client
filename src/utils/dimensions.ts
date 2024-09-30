@@ -152,7 +152,7 @@ export const extractInsetsFrom = (node: XMLNode) => {
   return { left, right, top, bottom };
 };
 
-export const extractValueFrom = (node: XMLNode) => {
+export const extractValueFrom = (node: XMLNode, convertAbsValue: boolean = true) => {
   let value = undefined;
 
   let val = node.attributes.get('val');
@@ -174,8 +174,12 @@ export const extractValueFrom = (node: XMLNode) => {
     case 'absvalue':
       val = child.attributes.get('val');
       if (val) {
-        const ndc = parseFloat(val) / maxAspectCompensation;
-        value = NDCtoDDCWidth(ndc);
+        if (convertAbsValue) {
+          const ndc = parseFloat(val) / maxAspectCompensation;
+          value = NDCtoDDCWidth(ndc);
+        } else {
+          value = parseFloat(val);
+        }
       }
       break;
     case 'relvalue':

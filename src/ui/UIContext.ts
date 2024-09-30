@@ -1,4 +1,4 @@
-import { Status, path, stringToBoolean } from '../utils';
+import { DDCtoNDC, NDCtoDDC, Status, enumRecordFor, maxAspectCompensation, path, stringToBoolean } from '../utils';
 import Client from '../Client';
 
 import DrawLayerType from './DrawLayerType';
@@ -12,6 +12,10 @@ import ScriptingContext from './scripting/ScriptingContext';
 import TemplateRegistry from './TemplateRegistry';
 import Texture from './components/simple/Texture';
 import XMLNode from './XMLNode';
+import EventContext from '../event/EventContext';
+import { EventType, KeyBoardEvent, MouseEvent } from '../event/Events';
+import FrameStrataType from './components/abstract/FrameStrataType';
+import { FrameEvent, FrameEventHandlerLUT } from './FrameEvent';
 
 class UIContext {
   static instance: UIContext;
@@ -21,6 +25,9 @@ class UIContext {
   renderer: Renderer;
   templates: TemplateRegistry;
   root: UIRoot;
+  mouseTarget: FrameEventHandlerLUT[FrameEvent.MOUSE] | null;
+  eventTargets: Record<FrameStrataType, Record<FrameEvent, (FrameEventHandlerLUT[FrameEvent])[]>>;
+  currentFocus: FrameEventHandlerLUT[FrameEvent.KEYBOARD] | null;
 
   constructor() {
     UIContext.instance = this;
@@ -31,6 +38,12 @@ class UIContext {
     this.templates = new TemplateRegistry();
 
     this.root = new UIRoot();
+
+    this.mouseTarget = null;
+    this.currentFocus = null;
+    this.eventTargets = enumRecordFor(FrameStrataType, (_type) => enumRecordFor(FrameEvent, (_event) => []));
+
+    this.registerEvents();
   }
 
   getParentNameFor(node: XMLNode) {
@@ -172,10 +185,6 @@ class UIContext {
           }
           break;
         }
-        case 'font': {
-          // TODO: Font support
-          break;
-        }
         // Other frame nodes
         default: {
           const name = attributes.get('name');
@@ -186,6 +195,8 @@ class UIContext {
             } else {
               status.warning('unnamed virtual node at top level');
             }
+          } else if (iname === 'font') {
+            status.error('fonts should always be virtual');
           } else {
             this.createFrame(child, null, status);
             LayoutFrame.resizePending();
@@ -194,6 +205,60 @@ class UIContext {
       }
     }
   }
+
+  // TODO: Break this out into a UIEventHandler
+  private registerEvents() {
+    EventContext.instance.on(EventType.MOUSEDOWN, this.onMouseDown.bind(this));
+    EventContext.instance.on(EventType.MOUSEMOVE, this.onMouseMove.bind(this));
+    EventContext.instance.on(EventType.MOUSEUP, this.onMouseUp.bind(this));
+    EventContext.instance.on(EventType.KEYDOWN, this.onKeyDown.bind(this));
+  }
+
+  private onMouseDown(event: MouseEvent) {
+    if (this.mouseTarget?.onMouseDown) {
+      this.mouseTarget.onMouseDown(event);
+    }
+    this.currentFocus = this.mouseTarget;
+  }
+
+  private onMouseUp(event: MouseEvent) {
+    if (this.mouseTarget?.onMouseUp) {
+      this.mouseTarget.onMouseUp(event);
+    }
+  }
+
+  private onMouseMove(event: MouseEvent) {
+    const { x, y } = event;
+    const oldTarget = this.mouseTarget;
+    let nextTarget = null;
+    for (let strata = FrameStrataType.TOOLTIP; strata >= FrameStrataType.WORLD; strata--) {
+      for (const frame of this.eventTargets[strata][FrameEvent.MOUSE]) {
+        if (frame.visible) {
+          if (frame.containsPoint(x, y)) {
+            nextTarget = frame;
+            break;
+          }
+        }
+      }
+      if (nextTarget) {
+        break;
+      }
+    }
+    if (oldTarget != nextTarget) {
+      this.mouseTarget = nextTarget;
+    }
+  }
+
+  private onKeyDown(event: KeyBoardEvent) {
+    if (this.currentFocus && this.currentFocus.onKeyDown) {
+      this.currentFocus.onKeyDown({ key: event.key });
+    }
+  }
+
+  enableEvent<E extends FrameEvent>(event: E, strata: FrameStrataType, target: FrameEventHandlerLUT[E] & Frame) {
+    this.eventTargets[strata][event].push(target);
+  }
 }
 
 export default UIContext;
+

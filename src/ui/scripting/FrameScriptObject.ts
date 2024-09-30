@@ -23,6 +23,8 @@ import {
   lua_type,
   luaL_error,
   luaL_ref,
+  lua_pushboolean,
+  lua_pushnil,
 } from './lua';
 import { This, ThisConstructor } from '../../utils';
 
@@ -112,12 +114,31 @@ class FrameScriptObject {
     return true;
   }
 
-  runScript(name: string, argsCount = 0) {
+  runScript(name: string, args: { type: string; value: any }[] = []) {
     // TODO: This needs to be moved to the caller
     const script = this.scripts.get(name);
     if (script && script.luaRef) {
-      // TODO: Pass in remaining arguments
-      ScriptingContext.instance.executeFunction(script.luaRef, this, argsCount);
+      for (const { type, value } of args) {
+        switch (type) {
+          case 'string': {
+            lua_pushstring(ScriptingContext.instance.state, value);
+            break;
+          }
+          case 'number': {
+            lua_pushnumber(ScriptingContext.instance.state, value);
+            break;
+          }
+          case 'nil': {
+            lua_pushnil(ScriptingContext.instance.state);
+            break;
+          }
+          case 'boolean': {
+            lua_pushboolean(ScriptingContext.instance.state, value);
+            break;
+          }
+        }
+      }
+      ScriptingContext.instance.executeFunction(script.luaRef, this, args.length);
     }
   }
 

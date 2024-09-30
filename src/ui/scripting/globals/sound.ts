@@ -1,12 +1,37 @@
-export const PlaySound = () => {
+import Client from '../../../Client';
+import { luaL_error, lua_State, lua_isstring, lua_pushnumber, lua_tojsstring } from '../../scripting/lua';
+
+export const PlaySound = (L: lua_State) => {
+  if (!lua_isstring(L, 1)) {
+    luaL_error(L, 'Usage: PlaySound("sound")');
+    console.error('Usage: PlaySound("sound")');
+    return 0;
+  }
+
+  const soundName = lua_tojsstring(L, 1);
+  Client.instance.sound.playByName(soundName);
   return 0;
 };
 
-export const PlayMusic = () => {
+export const PlayMusic = (L: lua_State) => {
+  if (!lua_isstring(L, 1)) {
+    luaL_error(L, 'Usage: PlayMusic("Path\\To\\File")');
+    return 0;
+  }
+
+  const sound = lua_tojsstring(L, 1);
+  console.error(`Playing ${sound}`);
   return 0;
 };
 
-export const PlaySoundFile = () => {
+export const PlaySoundFile = (L: lua_State) => {
+  if (!lua_isstring(L, 1)) {
+    luaL_error(L, 'Usage: PlaySoundFile("Path\\To\\File")');
+    return 0;
+  }
+
+  const sound = lua_tojsstring(L, 1);
+  console.error(`Playing ${sound}`);
   return 0;
 };
 
@@ -22,8 +47,9 @@ export const Sound_GameSystem_GetInputDriverNameByIndex = () => {
   return 0;
 };
 
-export const Sound_GameSystem_GetNumOutputDrivers = () => {
-  return 0;
+export const Sound_GameSystem_GetNumOutputDrivers = (L: lua_State) => {
+  lua_pushnumber(L, 0);
+  return 1;
 };
 
 export const Sound_GameSystem_GetOutputDriverNameByIndex = () => {

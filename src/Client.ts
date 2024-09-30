@@ -5,6 +5,7 @@ import Screen from './gfx/Screen';
 import TextureRegistry from './gfx/TextureRegistry';
 import UIContext from './ui/UIContext';
 import { fetch } from './utils';
+import SoundManager from './sound/SoundManager';
 
 type ClientOptions = {
   api: 'webgl2' | 'webgpu' | string
@@ -18,6 +19,7 @@ class Client {
   screen: Screen;
   textures: TextureRegistry;
   ui: UIContext;
+  sound: SoundManager;
 
   constructor(canvas: HTMLCanvasElement, { api }: ClientOptions) {
     Client.instance = this;
@@ -37,6 +39,7 @@ class Client {
     this.screen = new Screen(canvas);
     this.textures = new TextureRegistry();
     this.ui = new UIContext();
+    this.sound = new SoundManager();
   }
 }
 

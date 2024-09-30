@@ -62,7 +62,13 @@ export const QuitGameAndRunLauncher = () => {
   return 0;
 };
 
-export const PlayGlueMusic = () => {
+export const PlayGlueMusic = (L: lua_State) => {
+  if (!lua_isstring(L, 1)) {
+    luaL_error(L, 'Usage: PlayGlueMusic("NameOfMusic")');
+    return 0;
+  }
+
+  Client.instance.sound.playByName(lua_tojsstring(L, 1));
   return 0;
 };
 

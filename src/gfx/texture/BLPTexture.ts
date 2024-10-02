@@ -1,19 +1,19 @@
 import { BLP } from '../blp/BLP';
-import fetch from '../../utils/fetch';
 import type Texture from './Texture';
+import { VirtualFileSystem } from '../../resources/fs/VirtualFileSystem';
 
 class BLPTexture implements Texture {
   path: string;
   blp?: BLP;
 
-  constructor(path: string) {
+  constructor(path: string, fs: VirtualFileSystem) {
     this.path = path;
 
     if (!path.endsWith('.blp')) {
       path += '.blp';
     }
     
-    fetch(path, 'arrayBuffer').then(async (buffer) => {
+    fs.fetch(path).then(async (buffer) => {
       if (buffer.byteLength > 0) {
         this.blp = BLP.fromArray(buffer);
       }

@@ -1,4 +1,3 @@
-export { default as fetch } from './fetch';
 export { default as path } from './path';
 export * from './coordinates';
 export * from './datastructures';

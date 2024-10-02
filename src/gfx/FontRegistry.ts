@@ -1,9 +1,14 @@
+import { VirtualFileSystem } from '../resources/fs/VirtualFileSystem';
 import { HashMap, HashStrategy } from '../utils';
 import Font from './Font';
 
 class FontRegistry extends HashMap<string, Font> {
-  constructor() {
+  #fs: VirtualFileSystem;
+
+  constructor(fs: VirtualFileSystem) {
     super(HashStrategy.UPPERCASE);
+
+    this.#fs = fs;
   }
 
   lookup(path: string) {
@@ -11,6 +16,9 @@ class FontRegistry extends HashMap<string, Font> {
     if (!font) {
       font = new Font(path);
       this.set(path, font);
+      this.#fs.fetch(path).then((fontData) => {
+        font?.load(fontData);
+      });
     }
     return font;
   }

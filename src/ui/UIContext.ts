@@ -1,6 +1,4 @@
-import { DDCtoNDC, NDCtoDDC, Status, enumRecordFor, maxAspectCompensation, path, stringToBoolean } from '../utils';
-import Client from '../Client';
-
+import { Status, enumRecordFor, path, stringToBoolean } from '../utils';
 import DrawLayerType from './DrawLayerType';
 import FactoryRegistry from './components/FactoryRegistry';
 import FontString from './components/simple/FontString';
@@ -16,6 +14,7 @@ import EventContext from '../event/EventContext';
 import { EventType, KeyBoardEvent, MouseEvent } from '../event/Events';
 import FrameStrataType from './components/abstract/FrameStrataType';
 import { FrameEvent, FrameEventHandlerLUT } from './FrameEvent';
+import { VirtualFileSystem } from '../resources/fs/VirtualFileSystem';
 
 class UIContext {
   static instance: UIContext;
@@ -28,10 +27,12 @@ class UIContext {
   mouseTarget: FrameEventHandlerLUT[FrameEvent.MOUSE] | null;
   eventTargets: Record<FrameStrataType, Record<FrameEvent, (FrameEventHandlerLUT[FrameEvent])[]>>;
   currentFocus: FrameEventHandlerLUT[FrameEvent.KEYBOARD] | null;
+  #fs: VirtualFileSystem;
 
-  constructor() {
+  constructor(fs: VirtualFileSystem) {
     UIContext.instance = this;
 
+    this.#fs = fs;
     this.scripting = new ScriptingContext();
     this.factories = new FactoryRegistry();
     this.renderer = new Renderer();
@@ -123,7 +124,7 @@ class UIContext {
 
     const dirPath = path.dirname(tocPath);
 
-    const toc = await Client.instance.fetch(tocPath);
+    const toc = await this.#fs.fetchText(tocPath);
     if (!toc) {
       status.error(`could not open ${tocPath}`);
       return;
@@ -144,7 +145,7 @@ class UIContext {
   async loadFile(filePath: string, status = new Status()) {
     status.info('loading file', filePath);
 
-    const source = await Client.instance.fetch(filePath);
+    const source = await this.#fs.fetchText(filePath);
 
     // Handle Lua files
     if (filePath.endsWith('.lua')) {

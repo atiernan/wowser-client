@@ -3,12 +3,14 @@ import ScriptingEvent from './ui/scripting/EventType';
 import { ModelFFX } from './ui/components';
 import * as glueScriptFunctions from './ui/scripting/globals/glue';
 import { EventType as EngineEvent } from './event/Events';
+import HTTPFileSystem from './resources/fs/HTTPFileSystem';
 
 const params = new URLSearchParams(document.location.search);
 const api = params.get('api') || 'webgl2';
 
 const canvas = document.querySelector('canvas')!;
-const client = new Client(canvas, { api });
+const fs = new HTTPFileSystem(import.meta.env.VITE_GAME_ASSET_URL ?? '')
+const client = new Client(canvas, { api, fs });
 
 // TODO: Part of GlueMgr
 client.ui.scripting.registerFunctions(glueScriptFunctions);

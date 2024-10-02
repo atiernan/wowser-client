@@ -28,6 +28,7 @@
     "wow"
   ],
   "dependencies": {
+    "@wowserhq/format": "0.28.0",
     "@wowserhq/math": "0.2.2",
     "fengari": "0.1.4"
   },

@@ -1,11 +1,11 @@
 import { HashMap, HashStrategy } from '../../utils';
 
 import {
-  Button, CheckButton, EditBox, Frame, Model, ScrollFrame, SimpleHTML, Slider
+  Button, CheckButton, EditBox, Frame, Model, ScrollFrame, SimpleHTML, Slider, WorldFrame
 } from '.';
 
 const DEFAULT_FACTORIES = {
-  Button, CheckButton, EditBox, Frame, Model, ScrollFrame, SimpleHTML, Slider
+  Button, CheckButton, EditBox, Frame, Model, ScrollFrame, SimpleHTML, Slider, WorldFrame
 };
 
 type FactoryConstructor = new (parent: Frame | null) => Frame;

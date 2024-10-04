@@ -7,6 +7,11 @@ import {
   luaL_error,
   luaL_ref,
   luaL_unref,
+  lua_pushnumber,
+  LUA_TTABLE,
+  lua_len,
+  lua_tonumber,
+  lua_pop,
 } from '../lua';
 
 export const setglobal = () => {
@@ -137,4 +142,16 @@ export const debuglocals = () => {
 
 export const scrub = () => {
   return 0;
+};
+
+export const getn = (L: lua_State) => {
+  if (lua_type(L, 1) !== LUA_TTABLE) {
+    luaL_error(L, 'Usage: getn(table)');
+    return 0;
+  }
+  lua_len(L , 1);
+  const length = lua_tonumber(L, -1);
+  lua_pop(L, 1);
+  lua_pushnumber(L, length);
+  return 1;
 };

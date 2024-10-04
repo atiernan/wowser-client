@@ -1,6 +1,6 @@
 import { DataReader } from '../utils/DataReader';
-import { fetch } from '../utils';
 import DBCRecord from './DBCRecord';
+import { VirtualFileSystem } from './fs/VirtualFileSystem';
 
 class DBC<T> {
   records: T[];
@@ -11,12 +11,12 @@ class DBC<T> {
     this.strings = [];
   }
 
-  static async loadFile<RecordType>(path: string, type: DBCRecord<RecordType>): Promise<DBC<RecordType>> {
-    const response = await fetch(path, 'arrayBuffer');
+  static async loadFile<RecordType>(fs: VirtualFileSystem, path: string, type: DBCRecord<RecordType>): Promise<DBC<RecordType>> {
+    const response = await fs.fetch(path);
     return DBC.loadFromArray(type, response);
   }
 
-  static loadFromArray<RecordType>(type: DBCRecord<RecordType>, data: Uint8Array): DBC<RecordType> {
+  static loadFromArray<RecordType>(type: DBCRecord<RecordType>, data: ArrayBuffer): DBC<RecordType> {
     const reader = new DataReader(data);
     return this.load(type, reader);
   }

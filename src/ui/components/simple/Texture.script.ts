@@ -1,4 +1,5 @@
-import { lua_State } from '../../scripting/lua';
+import { Vector2 } from '@wowserhq/math';
+import { lua_gettop, lua_State, lua_tonumber, luaL_error } from '../../scripting/lua';
 
 import Texture from './Texture';
 
@@ -82,7 +83,25 @@ export const GetTexCoord = () => {
   return 0;
 };
 
-export const SetTexCoord = () => {
+export const SetTexCoord = (L: lua_State) => {
+  const texture = Texture.getObjectFromStack(L);
+
+  if (lua_gettop(L) != 5) {
+    return luaL_error(L, 'Usage: SetTexCoord(coord1, coord2, coord3, coord4)');
+  }
+
+  const left = lua_tonumber(L, 2);
+  const right = lua_tonumber(L, 3);
+  const top = lua_tonumber(L, 4);
+  const bottom = lua_tonumber(L, 5);
+  const coords = [
+    new Vector2([left, top]),
+    new Vector2([left, bottom]),
+    new Vector2([right, top]),
+    new Vector2([right, bottom]),
+  ] as const;
+  texture.setTextureCoords(coords);
+  //texture.onRegionChanged();
   return 0;
 };
 

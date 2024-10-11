@@ -51,7 +51,7 @@ class TemplateRegistry extends HashMap<string, TemplateNode> {
       this.set(name, entry);
     }
 
-    status.info(`registered virtual frame ${name}`);
+    status.debug(`registered virtual frame ${name}`);
   }
 }
 

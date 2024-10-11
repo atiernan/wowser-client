@@ -62,10 +62,10 @@ class EditBox extends Frame {
           this.fontString.setPoint(FramePointType.LEFT, this, FramePointType.LEFT, 12 / maxAspectCompensation);
           this.fontString.font.horizontalAlignment = FontHorizontalAlignment.LEFT;
           this.fontString.show();
-          this.setValue('hello');
           break;
       }
     }
+    this.setValue('a');
   }
 
   hasFocus() {

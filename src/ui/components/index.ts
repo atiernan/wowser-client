@@ -7,3 +7,4 @@ export { default as ModelFFX } from './singletons/ModelFFX';
 export { default as ScrollFrame } from './simple/ScrollFrame';
 export { default as SimpleHTML } from './simple/HTML';
 export { default as Slider } from './simple/Slider';
+export { default as WorldFrame } from './singletons/WorldFrame';

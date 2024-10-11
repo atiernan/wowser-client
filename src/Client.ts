@@ -6,7 +6,9 @@ import TextureRegistry from './gfx/TextureRegistry';
 import FontRegistry from './gfx/FontRegistry';
 import UIContext from './ui/UIContext';
 import EventContext from './event/EventContext';
+import SoundManager from './audio/AudioManager';
 import { VirtualFileSystem } from './resources/fs/VirtualFileSystem';
+import { DBCManager } from './db/DBCManager';
 
 type ClientOptions = {
   api: 'webgl2' | 'webgpu' | string;
@@ -26,6 +28,7 @@ class Client {
   ui: UIContext;
   events: EventContext;
   sound: SoundManager;
+  dbcManager: DBCManager;
   fs: VirtualFileSystem;
 
   constructor(canvas: HTMLCanvasElement, { api, fs }: ClientOptions) {
@@ -52,12 +55,13 @@ class Client {
     }
 
     this.fs = fs;
+    this.dbcManager = new DBCManager({fs: this.fs});
     this.events = new EventContext();
     this.screen = new Screen(canvas);
     this.textures = new TextureRegistry(this.fs);
     this.fonts = new FontRegistry(this.fs);
     this.ui = new UIContext(this.fs);
-    this.sound = new SoundManager();
+    this.sound = new SoundManager(this.fs, this.dbcManager);
   }
 }
 

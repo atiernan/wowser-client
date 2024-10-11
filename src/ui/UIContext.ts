@@ -70,9 +70,9 @@ class UIContext {
   createFrame(node: XMLNode, parent: Frame | null, status = new Status()) {
     const name = node.attributes.get('name');
     if (name) {
-      status.info(`creating ${node.name} named ${name}`);
+      status.debug(`creating ${node.name} named ${name}`);
     } else {
-      status.info(`creating unnamed ${node.name}`);
+      status.debug(`creating unnamed ${node.name}`);
     }
 
     const factory = this.factories.get(node.name);
@@ -143,7 +143,7 @@ class UIContext {
   }
 
   async loadFile(filePath: string, status = new Status()) {
-    status.info('loading file', filePath);
+    status.debug('loading file', filePath);
 
     const source = await this.#fs.fetchText(filePath);
 

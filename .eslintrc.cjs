@@ -12,6 +12,7 @@ module.exports = {
   env: { browser: true, node: true },
   rules: {
     '@typescript-eslint/no-this-alias': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unused-vars': ['error', {
       'argsIgnorePattern': '^_',
       'varsIgnorePattern': '^_'

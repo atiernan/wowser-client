@@ -1,10 +1,11 @@
 /* eslint-disable no-console, import/prefer-default-export */
 
 enum StatusType {
-  INFO = 0x0,
-  WARNING = 0x1,
-  ERROR = 0x2,
-  FATAL = 0x3,
+  DEBUG = 0x0,
+  INFO = 0x1,
+  WARNING = 0x2,
+  ERROR = 0x3,
+  FATAL = 0x4,
 }
 
 type StatusArgs = Array<unknown>;
@@ -22,6 +23,11 @@ class Status {
 
   add(type: StatusType, ...args: StatusArgs) {
     this.entries.push({ type, args });
+  }
+
+  debug(...args: StatusArgs) {
+    console.debug(...args);
+    this.add(StatusType.DEBUG, ...args);
   }
 
   info(...args: StatusArgs) {

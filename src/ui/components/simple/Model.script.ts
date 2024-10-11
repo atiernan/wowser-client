@@ -1,4 +1,21 @@
-export const SetModel = () => {
+import { lua_isstring, lua_State, lua_tojsstring, lua_type, lua_typename, luaL_error } from '../../scripting/lua';
+import Model from './Model';
+
+export const SetModel = (L: lua_State): number => {
+  const model = Model.getObjectFromStack(L);
+
+  if (!lua_isstring(L, 2)) {
+    const type = lua_typename(L, lua_type(L, 2));
+    return luaL_error(L, 'Unexpected %s, expected string in %s:SetModel(text)', type, model.displayName);
+  }
+
+  const modelPath = lua_tojsstring(L, 2);
+  console.log(`Changing model to ${modelPath}`);
+  model.setModel(modelPath);
+  return 0;
+};
+
+export const OnUpdateModel = () => {
   return 0;
 };
 
@@ -91,5 +108,9 @@ export const ClearFog = () => {
 };
 
 export const SetGlow = () => {
+  return 0;
+};
+
+export const ResetLights = () => {
   return 0;
 };

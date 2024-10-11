@@ -129,7 +129,7 @@ class ScriptingContext {
 
   execute(source: string, filename = '<inline>') {
     console.groupCollapsed('executing', filename);
-    console.log(source.slice(0, 500));
+    console.debug(source.slice(0, 500));
 
     const L = this.state;
 
@@ -307,6 +307,7 @@ class ScriptingContext {
       lua_pushstring(L, msg);
       lua_replace(L, -2);
     }
+    console.error(msg);
 
     // Invoke the Lua-side error handler (if any)
     if (this.errorHandlerFunc) {

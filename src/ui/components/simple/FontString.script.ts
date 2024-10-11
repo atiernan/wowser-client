@@ -85,14 +85,22 @@ export const GetFieldSize = () => {
 export const SetText = (L: lua_State) => {
   const fontString = <FontString>FontString.getObjectFromStack(L);
   
+  let text = '';
   if (lua_isnil(L, 1)) {
-    fontString.setText('');
+    text = '';
   } else if (lua_isstring(L, 1)) {
-    fontString.setText(lua_tojsstring(L, 1));
+    text = lua_tojsstring(L, 1);
+  } else if (lua_isstring(L , 2)) {
+    text = lua_tojsstring(L, 2);
   } else {
-    const type = lua_typename(L, lua_type(L, 1));
-    return luaL_error(L, 'Unexpected %s, expected string in %s:SetText(text)', type, fontString.displayName);
+    try {
+      //fontString.setText(lua_tojsstring(L, 1));
+    } catch (_e) {
+      const type = lua_typename(L, lua_type(L, 1));
+      return luaL_error(L, 'Unexpected %s, expected string in %s:SetText(text)', type, fontString.displayName);
+    }
   }
+  fontString.setText(text);
 
   return 0;
 };

@@ -28,9 +28,11 @@
     "wow"
   ],
   "dependencies": {
+    "@types/three": "0.169.0",
     "@wowserhq/format": "0.28.0",
     "@wowserhq/math": "0.2.2",
-    "fengari": "0.1.4"
+    "fengari": "0.1.4",
+    "three": "^0.161.0"
   },
   "devDependencies": {
     "@babel/preset-env": "7.24.4",

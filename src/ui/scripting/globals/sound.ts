@@ -1,4 +1,5 @@
 import Client from '../../../Client';
+import { AudioType } from '../../../audio/AudioDriver';
 import { luaL_error, lua_State, lua_isstring, lua_pushnumber, lua_tojsstring } from '../../scripting/lua';
 
 export const PlaySound = (L: lua_State) => {
@@ -9,7 +10,7 @@ export const PlaySound = (L: lua_State) => {
   }
 
   const soundName = lua_tojsstring(L, 1);
-  Client.instance.sound.playByName(soundName);
+  Client.instance.sound.playByName(soundName, AudioType.Effects);
   return 0;
 };
 

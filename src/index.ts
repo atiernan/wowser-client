@@ -3,13 +3,13 @@ import ScriptingEvent from './ui/scripting/EventType';
 import { ModelFFX } from './ui/components';
 import * as glueScriptFunctions from './ui/scripting/globals/glue';
 import { EventType as EngineEvent } from './event/Events';
-import HTTPFileSystem from './resources/fs/HTTPFileSystem';
+import { HTTPFileSystem } from './resources/fs/HTTPFileSystem';
 
 const params = new URLSearchParams(document.location.search);
 const api = params.get('api') || 'webgl2';
 
 const canvas = document.querySelector('canvas')!;
-const fs = new HTTPFileSystem(import.meta.env.VITE_GAME_ASSET_URL ?? '')
+const fs = new HTTPFileSystem(import.meta.env.VITE_GAME_ASSET_URL ?? '', 'wowser');
 const client = new Client(canvas, { api, fs });
 
 // TODO: Part of GlueMgr
@@ -30,22 +30,28 @@ client.ui.factories.register('ModelFFX', ModelFFX);
   client.ui.scripting.signalEvent(ScriptingEvent.SET_GLUE_SCREEN, '%s', 'login');
 
   let last = new Date();
+  let frameCount = 0;
+  const debug = true;
   const updateAndRender = () => {
     const now = new Date();
     const diff = +now - +last;
-
 
     client.ui.root.onLayerUpdate(diff);
     client.screen.render();
 
     last = now;
-    //window.requestAnimationFrame(updateAndRender);
+    if (frameCount++ < 20 || !debug ) {
+      window.requestAnimationFrame(updateAndRender);
+    }
   };
 
+  // Debug, to allow access from the console
   window.client = client;
 
   // Postpone rendering to allow resources to load (for now)
-  setTimeout(updateAndRender, 1000);
+  setTimeout(() => {
+    updateAndRender();
+  }, 1000);
 
   function canvasToWorldCoords(canvasX: number, canvasY: number) {
     const rect = canvas.getBoundingClientRect();
@@ -56,6 +62,7 @@ client.ui.factories.register('ModelFFX', ModelFFX);
     return client.ui.renderer.mouseToWorldSpace(clipX, clipY);
   }
 
+  //canvas.addEventListener('click', () => updateAndRender());
   canvas.addEventListener('mousedown', (event) => {
     const {x, y} = canvasToWorldCoords(event.x, event.y);
     client.events.processEvent(EngineEvent.MOUSEDOWN, { x, y, button: event.button });

@@ -160,6 +160,25 @@ class Renderer {
     p.multiplyMatrix4(viewProjMatrix);
     return { x: p.x, y: p.y };
   }
+
+  worldToScreenSpace(x: number, y: number) {
+    const root = UIRoot.instance;
+    const projMatrix = new Matrix4([
+      2.50000024, 0, 0, 0,
+      0, 3.33333349, 0, 0,
+      -0, -0, -0.00200000009, 0,
+      0, 0, 0, 1,
+    ]);
+    const offsetX = (root.rect.minX + root.rect.maxX) * 0.5;
+    const offsetY = (root.rect.minY + root.rect.maxY) * 0.5;
+    const viewProjMatrix = new Matrix4();
+    viewProjMatrix.translate([offsetX, offsetY, 0.0]);
+    viewProjMatrix.multiply(projMatrix).transpose();
+    const p = new Vector3();
+    p.setElements(x, y, -1);
+    p.multiplyMatrix4(viewProjMatrix);
+    return { x: p.x, y: p.y };
+  }
 }
 
 export default Renderer;

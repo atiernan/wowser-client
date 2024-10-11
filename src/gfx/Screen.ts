@@ -3,6 +3,7 @@ import { LinkedList, LinkStrategy } from '../utils';
 
 import ScreenLayer from './ScreenLayer';
 import WebGL2Device from './apis/webgl2/WebGL2Device';
+import * as THREE from 'three';
 
 class Screen {
   static instance: Screen;
@@ -10,12 +11,17 @@ class Screen {
   canvas: HTMLCanvasElement;
   layers: LinkedList<ScreenLayer>;
   debugProgram?: WebGLProgram;
+  renderer: THREE.WebGLRenderer;
 
   constructor(canvas: HTMLCanvasElement) {
     Screen.instance = this;
 
     this.canvas = canvas;
     this.layers = LinkedList.using('zorderLink');
+
+    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
+    this.renderer.setSize(this.canvas.width, this.canvas.height, false);
+    this.renderer.shadowMap.enabled = true;
 
     this.render = this.render.bind(this);
 

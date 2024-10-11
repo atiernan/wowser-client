@@ -5,21 +5,28 @@ export enum AudioType {
   Dialog,
 }
 
-interface PlayingAudio {
-  id: string;
+export interface PlayingAudio {
+  id: number;
   promise: Promise<void>
 }
 
+interface PlayingAduioNode {
+  source: null | AudioBufferSourceNode;
+  gainNode: null | GainNode;
+}
+
 export class AudioDriver {
+  #currentId: number;
   #context: AudioContext;
   #masterVolume: GainNode;
   #ambienceVolume: GainNode;
   #effectsVolume: GainNode;
   #musicVolume: GainNode;
   #dialogVolume: GainNode;
-  #playingAudio: Record<string, PlayingAudio>;
+  #playingAudio: Record<number, PlayingAduioNode>;
 
   constructor() {
+    this.#currentId = 0;
     this.#context = new AudioContext();
     this.#masterVolume = this.#context.createGain();
     this.#masterVolume.gain.setValueAtTime(0, this.#context.currentTime);
@@ -34,7 +41,7 @@ export class AudioDriver {
     this.#effectsVolume.connect(this.#masterVolume);
 
     this.#musicVolume = this.#context.createGain();
-    this.#musicVolume.gain.setValueAtTime(1, this.#context.currentTime);
+    this.#musicVolume.gain.setValueAtTime(0.8, this.#context.currentTime);
     this.#musicVolume.connect(this.#masterVolume);
 
     this.#dialogVolume = this.#context.createGain();
@@ -45,7 +52,7 @@ export class AudioDriver {
   }
 
   public playAudio(data: ArrayBuffer, volume: number, loop: boolean, type: AudioType): PlayingAudio {
-    const id = '123';
+    const id = this.#currentId++;
     const promise = new Promise<void>((resolve) => {
       this.#context.decodeAudioData(data.slice(0)).then((buffer) => {
         const src = this.#context.createBufferSource();
@@ -73,20 +80,31 @@ export class AudioDriver {
         src.connect(gainNode);
         src.start(0);
         src.loop = loop;
-        this.#context.decodeAudioData(data);
         src.onended = () => {
           gainNode.disconnect();
           src.disconnect();
           resolve();
         };
+        this.#playingAudio[id].source = src;
+        this.#playingAudio[id].gainNode = gainNode;
       });
     });
 
-    this.#playingAudio[id] = { id, promise };
+    this.#playingAudio[id] = { source: null, gainNode: null };
     return { id, promise };
   }
 
-  public stopAudio() {
-    
+  public stopAudio(id: number) {
+    if (this.#playingAudio[id]) {
+      if (this.#playingAudio[id].source) {
+        this.#playingAudio[id].source.stop();
+        this.#playingAudio[id].source.disconnect();
+      }
+      if (this.#playingAudio[id].gainNode) {
+        this.#playingAudio[id].gainNode.disconnect();
+      }
+
+      delete this.#playingAudio[id];
+    }
   }
 }

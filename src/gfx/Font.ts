@@ -6,8 +6,13 @@ class Font {
     this.path = path;
   }
 
+  static pathToName(path: string) {
+    return path.replaceAll('\\', '_');
+  }
+
   load(data: ArrayBuffer) {
-    this.font = new FontFace(this.path, data);
+    const name = Font.pathToName(this.path);
+    this.font = new FontFace(name, data);
     document.fonts.add(this.font);
   }
 

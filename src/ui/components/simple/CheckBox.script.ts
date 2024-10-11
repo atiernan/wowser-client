@@ -1,4 +1,4 @@
-import { lua_isnumber, lua_State, lua_toboolean, lua_tonumber } from '../../scripting/lua';
+import { lua_pushboolean, lua_State, lua_toboolean } from '../../scripting/lua';
 import CheckBox from './CheckBox';
 
 export const SetChecked = (L: lua_State) => {
@@ -7,8 +7,10 @@ export const SetChecked = (L: lua_State) => {
   return 0;
 };
 
-export const GetChecked = () => {
-  return 0;
+export const GetChecked = (L: lua_State) => {
+  const checkBox = CheckBox.getObjectFromStack(L);
+  lua_pushboolean(L, checkBox.checked);
+  return 1;
 };
 
 export const GetCheckedTexture = () => {

@@ -4,3 +4,5 @@
 /public/*
 !/public/Shaders
 !/public/Wowser
+.env
+**/.DS_Store

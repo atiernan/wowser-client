@@ -1,10 +1,10 @@
 import Client from '../../../../Client';
+import { AudioType } from '../../../../audio/AudioDriver';
 import {
   DDCtoNDCWidth,
   NDCtoDDCHeight,
   NDCtoDDCWidth,
   maxAspectCompensation,
-  fetch,
 } from '../../../../utils';
 import {
   luaL_error,
@@ -77,13 +77,29 @@ export const QuitGameAndRunLauncher = () => {
   return 0;
 };
 
+let currentGlueMusicId: null | number = null;
+let loadingGlueMusic = false;
 export const PlayGlueMusic = (L: lua_State) => {
   if (!lua_isstring(L, 1)) {
     luaL_error(L, 'Usage: PlayGlueMusic("NameOfMusic")');
     return 0;
   }
 
-  Client.instance.sound.playByName(lua_tojsstring(L, 1));
+  if (loadingGlueMusic) {
+    return 0;
+  }
+
+  if (currentGlueMusicId !== null) {
+    StopGlueMusic();
+  }
+
+  loadingGlueMusic = true;
+  Client.instance.sound.playByName(lua_tojsstring(L, 1), AudioType.Music)
+    .then((audio) => {
+      if (audio !== null) {
+        currentGlueMusicId = audio.id;
+      }
+    }).finally(() => loadingGlueMusic = false);
   return 0;
 };
 
@@ -92,6 +108,9 @@ export const PlayCreditsMusic = () => {
 };
 
 export const StopGlueMusic = () => {
+  if (currentGlueMusicId !== null) {
+    Client.instance.sound.stop(currentGlueMusicId);
+  }
   return 0;
 };
 
@@ -205,8 +224,9 @@ export const DisconnectFromServer = () => {
   return 0;
 };
 
-export const IsConnectedToServer = () => {
-  return 0;
+export const IsConnectedToServer = (L: lua_State) => {
+  lua_pushboolean(L, true);
+  return 1;
 };
 
 export const EnterWorld = () => {
@@ -315,11 +335,18 @@ export const PINEntered = () => {
   return 0;
 };
 
-export const PlayGlueAmbience = () => {
+export const PlayGlueAmbience = (L: lua_State) => {
+  if (!lua_isstring(L, 2)) {
+    const type = lua_typename(L, lua_type(L, 2));
+    luaL_error(L, `Usage: PlayGlueMusic("NameOfMusic"), received ${type}`);
+    return 0;
+  }
+  Client.instance.sound.playByName(lua_tojsstring(L, 2), AudioType.Ambience);
   return 0;
 };
 
 export const StopGlueAmbience = () => {
+  console.error('StopGlueAmbience called');
   return 0;
 };
 
@@ -485,8 +512,9 @@ export const IsStreamingMode = () => {
   return 0;
 };
 
-export const IsStreamingTrial = () => {
-  return 0;
+export const IsStreamingTrial = (L: lua_State) => {
+  lua_pushboolean(L, false);
+  return 1;
 };
 
 export const IsConsoleActive = () => {

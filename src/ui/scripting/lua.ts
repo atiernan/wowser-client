@@ -74,6 +74,7 @@ const {
   lua_touserdata,
   lua_type,
   lua_typename,
+  lua_len,
 } = lua;
 
 const {
@@ -146,4 +147,5 @@ export {
   luaL_unref,
   to_jsstring,
   to_luastring,
+  lua_len,
 };

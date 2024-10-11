@@ -102,11 +102,15 @@ class FontString extends Region {
 
   setText(text: string, rerender: boolean = true) {
     const L = ScriptingContext.instance.state;
-    lua_getglobal(L, text);
-    if (lua_isstring(L, 1)) {
-      text = lua_tojsstring(L, 1);
+    try {
+      lua_getglobal(L, text);
+      if (lua_isstring(L, 1)) {
+        text = lua_tojsstring(L, 1);
+      }
+      lua_pop(L, 1);
+    } catch (e) {
+      // If the Lua variable doesn't exist the exception is thrown and we fallback to the text passed in
     }
-    lua_pop(L, 1);
     this.setTextRaw(text, rerender);
   }
 
